@@ -11,10 +11,14 @@ WORKDIR /usr/src/app
 
 # pip install python deps from requirements.txt on the resin.io build server
 RUN pip install --upgrade pip setuptools wheel
-#RUN pip install Adafruit_DHT 
+RUN git clone https://github.com/adafruit/Adafruit_Python_DHT.git 
 
 # This will copy all files in our root to the working  directory in the container
 COPY . ./
+
+WORKDIR /usr/src/app/Adafruit_Python_DHT
+RUN pwd && ls
+RUN python setup.py install
 
 # Enable udevd so that plugged dynamic hardware devices show up in our container.
 ENV UDEV=1
@@ -24,6 +28,6 @@ RUN mkdir -p /var/log/spud && \
 
 # main.py will run when container starts up on the device
 #CMD ["python","-u","src/main.py"]
-CMD python -u src/main.py > /var/log/spud/app.log 2>&1 & \
+WORKDIR /usr/src/app
+CMD python -u src/DHT11_read.py > /var/log/spud/app.log 2>&1 & \
     tail -f /var/log/spud/app.log
-    
